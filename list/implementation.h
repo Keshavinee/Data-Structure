@@ -1,60 +1,209 @@
 #include "student.h"
-#include<stdio.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-void insert(studentlist *l, student s, int index)
+// Initialising StudentList ADT 
+void init(studentlist *l)
 {
-    for (int i = l->n ; i > index; i--)
+    int n;
+    printf("Enter number of students:");
+    scanf("%d", &n);
+    l->n = n;
+}
+
+// Uploading information of a student 
+void create(student *s)
+{
+    printf("RegNo.:");
+    scanf("%d", &s->regno);
+    printf("Name :");
+    scanf(" %s", s->name);
+    printf("Mark 1 :");
+    scanf("%f", &s->mark[0]);
+    printf("Mark 2 :");
+    scanf("%f", &s->mark[1]);
+    printf("Mark 3 :");
+    scanf("%f", &s->mark[2]);
+    printf("Total :");
+    scanf("%f", &s->total);
+    printf("Result :");
+    scanf(" %c", &s->result);
+}
+
+// Inserting a student's data at the front of the list
+void insertFront(studentlist *l, student s)
+{
+    if (size <= l->n)
     {
-        l->list[i] = l->list[i-1] ;
+        printf("List overflow !");
     }
-    
-    l->list[index] = s;
-    l->n++;
+
+    else
+    {
+        for (int i = l->n; i > 0; i--)
+        {
+            l->list[i] = l->list[i - 1];
+        }
+
+        l->list[0] = s;
+        l->n++;
+    }
 }
 
-void display_student_details(student s)
+// Inserting a student's data at the end of the list
+void insertEnd(studentlist *l, student s)
 {
-    printf("RegNo.: %d  ",s.regno);
-    printf("Name : %s   ",s.name);
-    printf("Mark 1 : %d ",s.mark[0]);
-    printf("Mark 2 : %d ",s.mark[1]);
-    printf("Mark 3 : %d ",s.mark[2]);
-    printf("Total : %d  ",s.total);
-    printf("Result : %c ",s.result);
+    if (size <= l->n)
+    {
+        printf("List overflow !");
+    }
+
+    else
+    {
+        l->list[l->n] = s;
+        l->n++;
+    }
 }
 
-void display(studentlist l)
+// Inserting a student's data after a given Regno in the list 
+void insertRegNo(studentlist *l, student s, int regNum)
+{
+    int i = 0;
+
+    if (size <= l->n)
+    {
+        printf("List overflow !");
+    }
+
+    else
+    {
+        while (i < l->n)
+        {
+            if (l->list[i].regno == regNum)
+            {
+                break;
+            }
+            i++;
+        }
+
+        for (int j = l->n; j > i + 1; j--)
+        {
+            l->list[j] = l->list[j - 1];
+        }
+
+        l->list[i + 1] = s;
+        l->n++;
+    }
+}
+
+// Display student's data
+void display(student s)
+{
+    printf("RegNo.: %d  ", s.regno);
+    printf("Name : %s   ", s.name);
+    printf("Mark 1 : %f ", s.mark[0]);
+    printf("Mark 2 : %f ", s.mark[1]);
+    printf("Mark 3 : %f ", s.mark[2]);
+    printf("Total : %f ", s.total);
+    printf("Result : %c \n", s.result);
+}
+
+// Displaying the details of students based on name of the student 
+void searchName(studentlist l, char *name)
 {
     for (int i = 0; i < l.n; i++)
     {
-        display_student_details(l.list[i]);
-        printf("\n");
+        if (l.list[i].name == name)
+        {
+            display(l.list[i]);
+            break;
+        }
     }
-    
 }
 
-void assign(student *s, char line[])
+// Finfing the index of given data
+int find(studentlist *l, int regNum)
 {
-    char regno[20],m1[2],m2[2],m3[2],total[3];
-    int i;
-    for (i = 0; line[i] != " "; i++)
+    int i = 0;
+
+    while (i < l->n)
     {
-        regno[i] = line[i];
-    }
-    s->regno = (int) regno;
-    
-    for (int j=0; line[i] != " "; j++)
-    {
-        s->name[j] = line[i];
+        if (l->list[i].regno == regNum)
+        {
+            return i;
+        }
         i++;
     }
-    m1[0] = line[i] ; m1[1] = line[i+1];
-    m2[0] = line[i+3] ; m2[1] = line[i+4];
-    m3[0] = line[i+6] ; m3[1] = line[i+7];
 
-    total[0] = line[i+9] ; total[1] = line[i+10] ; total[2] = line[i+11] ; 
+    return -1;
+}
 
-    s->mark[0] = (int) m1 ; s->mark[1] = (int) m2 ; s->mark[2] = (int) m3 ; 
-    s->total = (int) total;
-    s->result = line[i+13];
+// Delete record given a register number  
+void deleteStudent(studentlist *l, int regNum)
+{
+    int pos = find(l, regNum);
+
+    if (pos == -1)
+    {
+        printf("Register number is not found!\n");
+    }
+
+    else
+    {
+        for (int i = pos; i < l->n - 1; i++)
+        {
+            l->list[i] = l->list[i + 1];
+        }
+        l->n--;
+    }
+}
+
+// listing the students who have passed
+studentlist result(studentlist l)
+{
+    int j = 0;
+    studentlist r;
+
+    for (int i = 0; i < l.n; i++)
+    {
+        if (l.list[i].result == 'P')
+        {
+            r.list[j] = l.list[i];
+            j++;
+        }
+    }
+    r.n = j;
+    return r;
+}
+
+// Listing the students how many have secured First Class
+int firstClass(studentlist l){
+    int n;
+    for (int i = 0; i < l.n; i++)
+    {
+        if (l.list[i].total >= 250.0)
+        {
+            n++;
+        }
+        
+    }
+    return n;
+}
+
+// Calculating the Total and updating the Result field about whether he / she is 
+// passed or not
+void computeResult(studentlist *l){
+    for (int i = 0; i < l->n; i++)
+    {
+        if (l->list[i].total >= 150.0)
+        {
+            l->list[i].result = 'P';
+        }
+        else
+        {
+            l->list[i].result = 'F';
+        }
+        
+    }
+    
 }
